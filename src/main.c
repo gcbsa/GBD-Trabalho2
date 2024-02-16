@@ -1,10 +1,20 @@
-#include <limits.h>
+#include <math.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <string.h>
 
-int main(int argc, char* argv[]) {
-    printf("%d\n", INT_MAX);
-    printf("%d\n", INT_MAX + 1);
+long stringHash(const char* restrict string) {
+    size_t n = strlen(string);
+    long acc = 0;
+
+    for (size_t i = 0; i < n; ++i)
+        acc += string[i] * pow(31, n - i - 1);
+
+    return acc;
+}
+
+int main(void) {
+    printf("Hash: %ld\n", stringHash("Bom dia"));
 
     return 0;
 }
