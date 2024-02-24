@@ -80,7 +80,7 @@ bool HashMap_remove(HashMap hashMap, char* str) {
 
 int main(void) {
     HashMap(registros);
-    char buffer[256];
+    char buffer[STRING_SIZE];
 
     FILE* file;
     file = fopen("dblp.txt", "r");
@@ -88,8 +88,7 @@ int main(void) {
         fprintf(stderr, "Erro ao ler o arquivo");
         return 1;
     }
-    while (fgets(buffer, 256, file) != NULL) {
-        printf("%s\n", buffer);
+    while (fgets(buffer, STRING_SIZE, file) != NULL) {
         HashMap_insert(registros, buffer);
     }
 
