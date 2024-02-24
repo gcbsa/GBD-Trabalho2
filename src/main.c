@@ -17,8 +17,8 @@ struct Bucket {
 
 void Bucket_insert(struct Bucket* b, char* str) {
     if (b->nextFreeIndex >= BUCKET_CAPACITY) {  // Estouro
-        puts("Bucket de estouro utilizado");
         if (b->estouro == NULL) {
+            puts("Bucket de estouro criado");
             b->estouro = malloc(sizeof(struct Bucket));
             b->estouro->nextFreeIndex = 0;
             b->estouro->estouro = NULL;
@@ -34,7 +34,7 @@ void Bucket_insert(struct Bucket* b, char* str) {
 }
 
 bool Bucket_remove(struct Bucket* b, char* str) {
-    for (int i = 0; i < 200; ++i) {
+    for (int i = 0; i < BUCKET_CAPACITY; ++i) {
         if (strcmp(b->values[i], str) == 0) {
             free(b->values[i]);
             b->values[i] = b->values[--b->nextFreeIndex];
@@ -60,7 +60,7 @@ typedef struct Bucket HashMap[BUCKET_COUNT];
 
 long stringHash(const char* restrict str) {
     size_t n = strlen(str);
-    long acc = 0;
+    unsigned long acc = 0;
 
     for (size_t i = 0; i < n; ++i)
         acc += str[i] * pow(31, n - i - 1);

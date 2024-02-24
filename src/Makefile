@@ -22,7 +22,7 @@ CFLAGS=-pedantic-errors -Wall -lm -I$(INC)
 # ALL_CFLAGS são flags aplicadas em builds padrões (make all)
 ALL_CFLAGS=$(CFLAGS) -g
 RELEASE_CFLAGS=$(CFLAGS) -O2 -DNDEBUG
-DEBUG_CFLAGS=$(CFLAGS) -g -fsanitize=address -fsanitize=undefined -ftrapv
+DEBUG_CFLAGS=$(CFLAGS) -g -fsanitize=address -fsanitize=undefined -ftrapv -Wall -Wextra
 # Diretório do código fonte
 SRC=.
 # Diretório com arquivos.h
