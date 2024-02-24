@@ -65,10 +65,18 @@ int main(void) {
     HashMap registros = {0};
     char buffer[256];
 
-    printf("Digite uma string: ");
-    fgets(buffer, 256, stdin);
-    printf("Deu certo? %d\n", HashMap_insert(registros, buffer));
-    printf("Deu certo? %d\n", HashMap_remove(registros, buffer));
+    FILE* file;
+    file = fopen("dblp.txt", "r");
+    if (file == NULL)
+    {
+        fprintf(stderr, "Erro ao ler o arquivo");
+        return 1;
+    }
+    while (fgets(buffer, 256, file) != NULL)
+    {
+        printf("%s %d\n", buffer,HashMap_insert(registros, buffer));
+    }
+    
 
     return 0;
 }
