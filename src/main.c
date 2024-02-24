@@ -49,11 +49,13 @@ bool Bucket_remove(struct Bucket* b, char* str) {
 #define BUCKET_COUNT 10
 // Deve ser zero-initialized
 typedef struct Bucket HashMap[BUCKET_COUNT];
-#define HashMap(nome)                             \
-    HashMap nome;                                 \
-    for (unsigned i = 0; i < BUCKET_COUNT; ++i) { \
-        nome[i].nextFreeIndex = 0;                \
-        nome[i].estouro = NULL;                   \
+#define HashMap(nome)                                  \
+    HashMap nome;                                      \
+    for (unsigned i = 0; i < BUCKET_COUNT; ++i) {      \
+        nome[i].nextFreeIndex = 0;                     \
+        nome[i].estouro = NULL;                        \
+        for (unsigned j = 0; j < BUCKET_CAPACITY; ++j) \
+            nome[i].values[j] = NULL;                  \
     }
 
 long stringHash(const char* restrict str) {
@@ -82,16 +84,14 @@ int main(void) {
 
     FILE* file;
     file = fopen("dblp.txt", "r");
-    if (file == NULL)
-    {
+    if (file == NULL) {
         fprintf(stderr, "Erro ao ler o arquivo");
         return 1;
     }
-    while (fgets(buffer, 256, file) != NULL)
-    {
-        printf("%s %d\n", buffer,HashMap_insert(registros, buffer));
+    while (fgets(buffer, 256, file) != NULL) {
+        printf("%s\n", buffer);
+        HashMap_insert(registros, buffer);
     }
-    
 
     return 0;
 }
