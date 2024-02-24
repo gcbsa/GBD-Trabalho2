@@ -7,6 +7,8 @@
 
 #define STRING_SIZE 200
 
+unsigned nro_buckets_estouro = 0;
+
 // A ordem dos elementos no Bucket não é garantida.
 #define BUCKET_CAPACITY 200
 struct Bucket {
@@ -18,7 +20,7 @@ struct Bucket {
 void Bucket_insert(struct Bucket* b, char* str) {
     if (b->nextFreeIndex >= BUCKET_CAPACITY) {  // Estouro
         if (b->estouro == NULL) {
-            puts("Bucket de estouro criado");
+            nro_buckets_estouro++;
             b->estouro = malloc(sizeof(struct Bucket));
             b->estouro->nextFreeIndex = 0;
             b->estouro->estouro = NULL;
@@ -81,16 +83,18 @@ bool HashMap_remove(HashMap hashMap, char* str) {
 int main(void) {
     HashMap(registros);
     char buffer[STRING_SIZE];
-
     FILE* file;
     file = fopen("dblp.txt", "r");
     if (file == NULL) {
-        fprintf(stderr, "Erro ao ler o arquivo");
+        perror("Erro ao ler o arquivo");
         return 1;
     }
+
     while (fgets(buffer, STRING_SIZE, file) != NULL) {
         HashMap_insert(registros, buffer);
     }
+
+    printf("Numero de buckets com estouro: %ud", nro_buckets_estouro);
 
     return 0;
 }
