@@ -6,40 +6,55 @@
 #include <string.h>
 
 #define STRING_SIZE 200
-typedef char* string_t;
 
 // A ordem dos elementos no Bucket não é garantida.
 #define BUCKET_CAPACITY 200
 struct Bucket {
-    unsigned nextFree;
-    string_t values[BUCKET_CAPACITY];
+    unsigned nextFreeIndex;
+    char* values[BUCKET_CAPACITY];
+    struct Bucket* estouro;
 };
 
-bool Bucket_insert(struct Bucket* b, string_t str) {
-    if (b->nextFree >= BUCKET_CAPACITY)  // Estouro
-        return false;
+void Bucket_insert(struct Bucket* b, char* str) {
+    if (b->nextFreeIndex >= BUCKET_CAPACITY) {  // Estouro
+        if (b->estouro == NULL) {
+            puts("Bucket de estouro utilizado");
+            b->estouro = malloc(sizeof(struct Bucket));
+        }
+        Bucket_insert(b->estouro, str);
+        return;
+    }
 
-    string_t tmp = malloc(sizeof(char) * STRING_SIZE);
+    char* tmp = malloc(sizeof(char) * STRING_SIZE);
     strcpy(tmp, str);
-    b->values[b->nextFree] = tmp;
-    b->nextFree++;
-    return true;
+    b->values[b->nextFreeIndex] = tmp;
+    b->nextFreeIndex++;
 }
 
-bool Bucket_remove(struct Bucket* b, string_t str) {
+bool Bucket_remove(struct Bucket* b, char* str) {
     for (int i = 0; i < 200; ++i) {
         if (strcmp(b->values[i], str) == 0) {
             free(b->values[i]);
-            b->values[i] = b->values[--b->nextFree];
+            b->values[i] = b->values[--b->nextFreeIndex];
             return true;
         }
     }
-    return false;
+
+    if (b->estouro == NULL)
+        return false;
+
+    return Bucket_remove(b->estouro, str);
 }
 
 #define BUCKET_COUNT 10
 // Deve ser zero-initialized
 typedef struct Bucket HashMap[BUCKET_COUNT];
+#define HashMap(nome)                             \
+    HashMap nome;                                 \
+    for (unsigned i = 0; i < BUCKET_COUNT; ++i) { \
+        nome[i].nextFreeIndex = 0;                \
+        nome[i].estouro = NULL;                   \
+    }
 
 long stringHash(const char* restrict str) {
     size_t n = strlen(str);
@@ -51,18 +66,18 @@ long stringHash(const char* restrict str) {
     return acc % BUCKET_COUNT;
 }
 
-bool HashMap_insert(HashMap hashMap, string_t str) {
+void HashMap_insert(HashMap hashMap, char* str) {
     long index = stringHash(str);
-    return Bucket_insert(&hashMap[index], str);
+    Bucket_insert(&hashMap[index], str);
 }
 
-bool HashMap_remove(HashMap hashMap, string_t str) {
+bool HashMap_remove(HashMap hashMap, char* str) {
     long index = stringHash(str);
     return Bucket_remove(&hashMap[index], str);
 }
 
 int main(void) {
-    HashMap registros = {0};
+    HashMap(registros);
     char buffer[256];
 
     FILE* file;
