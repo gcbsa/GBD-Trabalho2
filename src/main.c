@@ -1,6 +1,7 @@
 #include <math.h>
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,7 +11,7 @@
 #define BUCKET_COUNT 100
 
 unsigned nro_buckets_estouro = 0;
-unsigned long long histograma[BUCKET_COUNT] = {0};
+unsigned long histograma[BUCKET_COUNT] = {0};
 
 // A ordem dos elementos no Bucket não é garantida.
 struct Bucket {
@@ -55,18 +56,18 @@ bool Bucket_remove(struct Bucket* b, char* str) {
 // Deve ser zero-initialized
 typedef struct Bucket HashMap[BUCKET_COUNT];
 
-unsigned long stringHash(const char* restrict str) {
+uint64_t stringHash(const char* restrict str) {
     size_t n = strlen(str);
-    unsigned long acc = 0;
+    uint64_t acc = 0;
 
     for (size_t i = 0; i < n; ++i)
-        acc += str[i] * pow(31, n - i - 1);
+        acc += str[i] * pow(53, n - i - 1);
 
     return acc % BUCKET_COUNT;
 }
 
 void HashMap_insert(HashMap hashMap, char* str) {
-    long index = stringHash(str);
+    uint64_t index = stringHash(str);
     histograma[index]++;
     Bucket_insert(&hashMap[index], str);
 }
@@ -99,7 +100,7 @@ int main(void) {
             "plot '-' title 'Quantidade' with linespoints linewidth 2 linetype "
             "1 pointtype 1\n");
     for (int i = 0; i < BUCKET_COUNT; i++)
-        fprintf(grafico, "%d %llu\n", i, histograma[i]);
+        fprintf(grafico, "%d %lu\n", i, histograma[i]);
     fprintf(grafico,
             "end\n"
             "pause -1\n");
