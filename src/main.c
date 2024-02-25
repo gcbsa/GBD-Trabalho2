@@ -6,11 +6,13 @@
 #include <string.h>
 
 #define STRING_SIZE 200
+#define BUCKET_CAPACITY 200
+#define BUCKET_COUNT 100
 
 unsigned nro_buckets_estouro = 0;
+unsigned long long histograma[BUCKET_COUNT] = {0};
 
 // A ordem dos elementos no Bucket não é garantida.
-#define BUCKET_CAPACITY 200
 struct Bucket {
     unsigned nextFreeIndex;
     char* values[BUCKET_CAPACITY];
@@ -50,17 +52,10 @@ bool Bucket_remove(struct Bucket* b, char* str) {
     return Bucket_remove(b->estouro, str);
 }
 
-#define BUCKET_COUNT 10
 // Deve ser zero-initialized
 typedef struct Bucket HashMap[BUCKET_COUNT];
-#define HashMap(nome)                             \
-    HashMap nome;                                 \
-    for (unsigned i = 0; i < BUCKET_COUNT; ++i) { \
-        nome[i].nextFreeIndex = 0;                \
-        nome[i].estouro = NULL;                   \
-    }
 
-long stringHash(const char* restrict str) {
+unsigned long stringHash(const char* restrict str) {
     size_t n = strlen(str);
     unsigned long acc = 0;
 
@@ -72,6 +67,7 @@ long stringHash(const char* restrict str) {
 
 void HashMap_insert(HashMap hashMap, char* str) {
     long index = stringHash(str);
+    histograma[index]++;
     Bucket_insert(&hashMap[index], str);
 }
 
@@ -81,20 +77,34 @@ bool HashMap_remove(HashMap hashMap, char* str) {
 }
 
 int main(void) {
-    HashMap(registros);
+    HashMap registros = {0};
     char buffer[STRING_SIZE];
-    FILE* file;
-    file = fopen("dblp.txt", "r");
+    FILE* file = fopen("dblp.txt", "r");
     if (file == NULL) {
         perror("Erro ao ler o arquivo");
-        return 1;
+        return EXIT_FAILURE;
     }
 
     while (fgets(buffer, STRING_SIZE, file) != NULL) {
         HashMap_insert(registros, buffer);
     }
+    printf("Numero de buckets com estouro: %u\n", nro_buckets_estouro);
 
-    printf("Numero de buckets com estouro: %ud", nro_buckets_estouro);
+    FILE* grafico = fopen("grafico.plt", "w");
+    fprintf(grafico,
+            "set title \"Histograma\"\n"
+            "set encoding iso_8859_1\n"
+            "set xlabel \"Hash\"\n"
+            "set ylabel \"Quantidade\"\n"
+            "plot '-' title 'Quantidade' with linespoints linewidth 2 linetype "
+            "1 pointtype 1\n");
+    for (int i = 0; i < BUCKET_COUNT; i++)
+        fprintf(grafico, "%d %llu\n", i, histograma[i]);
+    fprintf(grafico,
+            "end\n"
+            "pause -1\n");
 
-    return 0;
+    fclose(file);
+    fclose(grafico);
+    return EXIT_SUCCESS;
 }
