@@ -4,7 +4,7 @@ Thiago Pacheco Rocha 12121BCC033
 Gabriel Cardoso Brandão de Sousa Amaral 12011BSI255
 
 Verifique se a troca do valor 31 na função hash por outro valor (outro número
-primo? Testamos a distribuição com os números 31 e 53, o número 53 teve desempenho melhor.
+primo? Testamos a distribuição com os números 31 e 53, o número 53 teve desempenho melhor,pois os elementos foram distribuídos de maneira mais uniforme.
 
 Mesmo alterando a quantidade de elementos por bucket nos obtivemos a mesma quantidade de estouros: 34758
 Logo é importate haver a funcionalidade de bucket de estouro no nosso programa.
